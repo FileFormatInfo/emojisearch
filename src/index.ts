@@ -19,13 +19,13 @@ import {
 } from "tabulator-tables";
 
 type SearchEntry = {
-	code: string;
-	example: string;
-	name: string;
-	age: string;
-	block: string;
-	category: string;
-	tags?: string[];
+	codepoints: string;
+	qualification: string;
+	emoji: string;
+	description: string;
+	version: string;
+	group: string;
+	subgroup: string;
 };
 
 type SearchData = {
@@ -33,66 +33,16 @@ type SearchData = {
 	data: SearchEntry[];
 };
 
-const dataUrl = "/ucd.json";
-
-const categoryMap: { [key: string]: string } = {
-	"Cc": "Other, Control",
-	"Cf": "Other, Format",
-	"Cn": "Other, Not Assigned (no characters in the file have this property)",
-	"Co": "Other, Private Use",
-	"Cs": "Other, Surrogate",
-	"LC": "Letter, Cased",
-	"Ll": "Letter, Lowercase",
-	"Lm": "Letter, Modifier",
-	"Lo": "Letter, Other",
-	"Lt": "Letter, Titlecase",
-	"Lu": "Letter, Uppercase",
-	"Mc": "Mark, Spacing Combining",
-	"Me": "Mark, Enclosing",
-	"Mn": "Mark, Nonspacing",
-	"Nd": "Number, Decimal Digit",
-	"Nl": "Number, Letter",
-	"No": "Number, Other",
-	"Pc": "Punctuation, Connector",
-	"Pd": "Punctuation, Dash",
-	"Pe": "Punctuation, Close",
-	"Pf": "Punctuation, Final quote (may behave like Ps or Pe depending on usage)",
-	"Pi": "Punctuation, Initial quote (may behave like Ps or Pe depending on usage)",
-	"Po": "Punctuation, Other",
-	"Ps": "Punctuation, Open",
-	"Sc": "Symbol, Currency",
-	"Sk": "Symbol, Modifier",
-	"Sm": "Symbol, Math",
-	"So": "Symbol, Other",
-	"Zl": "Separator, Line",
-	"Zp": "Separator, Paragraph",
-	"Zs": "Separator, Space"
+type EmojiData = {
+	codepoints: string;
+	emoji: string;
+	description: string;
+	tags: string[];
 }
 
-// translates from a hex codepoint string to the actual character
-function codeToString(code: string):string {
-	return String.fromCodePoint(parseInt(code, 16));
-}
+const dataUrl = "/emoji.json";
 
-function filterCategory(
-	headerValue: string,
-	rowValue: string,
-	rowData: any,
-	filterParams: any
-) {
-	if (!headerValue) return true;
-
-	const headerUpper = headerValue.toUpperCase();
-	if (headerValue.length == 2) {
-		return rowValue.toUpperCase() == headerUpper;
-	}
-
-	const description = categoryMap[rowValue].toUpperCase();
-
-	return description.startsWith(headerUpper);
-}
-
-function filterName(
+function filterDescription(
 	headerValue: string,
 	sortValue: string,
 	rowData: any,
@@ -100,7 +50,7 @@ function filterName(
 ) {
 	if (!headerValue) return true;
 
-	const rowValue = rowData.name;
+	const rowValue = rowData.description as string;
 
 	if (headerValue.length == 1 && headerValue != "^" && headerValue != "/") {
 		// single character, do starts with
@@ -159,20 +109,20 @@ function filterTags(
 	return true;
 }
 
-function fmtCategory(cell: CellComponent) {
-	const val = cell.getValue() as string;
-	if (!val) {
-		return "(missing)";
-	}
-	return categoryMap[val] || val;
-}
-
-function fmtCodepoint(cell: CellComponent) {
+function fmtCodepoints(cell: CellComponent) {
 	const val = cell.getValue() as string;
 	if (!val) {
 		return "";
 	}
 	return `U+${val.toUpperCase()}`;
+}
+
+function fmtEmoji(cell: CellComponent) {
+	const val = cell.getValue() as string;
+	if (!val) {
+		return "";
+	}
+	return `<span style="font-size:2em;">${val}</span>`;
 }
 
 function fmtTags(cell: CellComponent) {
@@ -202,84 +152,12 @@ function fmtTags(cell: CellComponent) {
 	return container;
 }
 
-function imgTooltipFn(imgType: string) {
-	return function (e: MouseEvent, cell: CellComponent, onRendered: any) {
-		var value = cell.getValue();
-		if (!value) {
-			return "n/a";
-		}
-
-		const handle = cell.getRow().getData().logohandle;
-
-		const el = document.createElement("img");
-		el.src = `https://www.vectorlogo.zone/logos/${handle}/${handle}-${imgType}.svg`;
-		el.style.height = "256px";
-
-		return el;
-	};
-}
-
-function imgClickFn(imgType: string, extraParams: string) {
-	return function (e: UIEvent, cell: CellComponent) {
-		var value = cell.getValue();
-		if (!value) {
-			return;
-		}
-
-		const handle = cell.getRow().getCell("logohandle").getValue();
-
-		const url = `https://svg-viewer.fileformat.info/view.html?url=https://www.vectorlogo.zone/logos/${handle}/${handle}-${imgType}.svg&backUrl=https://www.vectorlogo.zone/logos/${handle}/${extraParams}`;
-		window.open(url, "_blank")?.focus();
-	};
-}
 
 function showError(msg: string) {
 	console.log(`ERROR: ${msg}`);
 	document.getElementById("loading")!.classList.add("d-none");
 	document.getElementById("errdiv")!.classList.remove("d-none");
 	document.getElementById("errmsg")!.innerHTML = msg;
-}
-
-
-const tickElement = `<svg enable-background="new 0 0 24 24" height="14" width="14" viewBox="0 0 24 24" xml:space="preserve"><path fill="#2DC214" clip-rule="evenodd" d="M21.652,3.211c-0.293-0.295-0.77-0.295-1.061,0L9.41,14.34  c-0.293,0.297-0.771,0.297-1.062,0L3.449,9.351C3.304,9.203,3.114,9.13,2.923,9.129C2.73,9.128,2.534,9.201,2.387,9.351  l-2.165,1.946C0.078,11.445,0,11.63,0,11.823c0,0.194,0.078,0.397,0.223,0.544l4.94,5.184c0.292,0.296,0.771,0.776,1.062,1.07  l2.124,2.141c0.292,0.293,0.769,0.293,1.062,0l14.366-14.34c0.293-0.294,0.293-0.777,0-1.071L21.652,3.211z" fill-rule="evenodd"></path></svg>`;
-
-function tickLinkFormatter(cell: CellComponent) {
-	const value = cell.getValue() as string;
-	if (!value) {
-		return "";
-	}
-	var el = document.createElement("a");
-	el.href = value;
-	el.target = "_blank";
-	el.innerHTML = tickElement;
-	return el;
-}
-
-function tickLinkFilter(
-	headerValue: boolean,
-	rowValue: string,
-	rowData: any,
-	filterParams: any
-) {
-	if (headerValue === true) {
-		return rowValue && rowValue.length > 0;
-	} else if (headerValue === false) {
-		return !rowValue || rowValue.length === 0;
-	}
-	return true; // null case
-}
-
-function toggleColumns(tbl: Tabulator, columns: string[]): void {
-	for (const col of columns) {
-		const column = tbl.getColumn(col);
-		if (column) {
-			if (column.isVisible()) {
-				column.hide();
-			} else {
-				column.show();
-			}
-		}
-	}
 }
 
 function toggleTagFilter(cell: CellComponent, tag: string): void {
@@ -314,13 +192,6 @@ function toggleTagArray(tags: string[], tag: string): string[] {
 	var idx = tags.indexOf(tag);
 	if (idx != -1) {
 		tags.splice(idx);
-		tags.push(`!${tag}`);
-		return tags;
-	}
-
-	idx = tags.indexOf(`!${tag}`);
-	if (idx != -1) {
-		tags.splice(idx);
 		return tags;
 	}
 
@@ -329,7 +200,7 @@ function toggleTagArray(tags: string[], tag: string): string[] {
 }
 
 async function main() {
-	let data: SearchEntry[];
+	let data: EmojiData[] = [];
 
 	var rawData:any;
 	try {
@@ -345,20 +216,23 @@ async function main() {
 		}
 		rawData = (await resp.json() as SearchData);
 	} catch (error) {
-		showError(`Error fetching Unicode character data: ${error}`);
+		showError(`Error fetching emoji data: ${error}`);
 		return;
 	}
 
-	data = rawData.data;
-
-	for (const row of data) {
-		row.example = codeToString(row.code);
+	for (const row of rawData.data) {
+		data.push( {
+			codepoints: row.codepoints,
+			emoji: row.emoji,
+			description: row.description,
+			tags: [row.group.replaceAll(' ', '-'), row.subgroup, row.qualification, row.version],
+		} );
 	}
 
 	console.log(data[0]);
 
 	const qs = new URLSearchParams(window.location.search);
-	const sort: Sorter[] = [ { column: "code", dir: "asc" } ];
+	const sort: Sorter[] = [ { column: "codepoints", dir: "asc" } ];
 	const filters: Filter[] = [];
 	if (qs) {
 		;
@@ -399,10 +273,10 @@ async function main() {
 					e.preventDefault();
 					e.stopPropagation();
 					table.alert(
-						`${data.name} (U+${data.code}) copied to clipboard`
+						`${data.description} copied to clipboard`
 					);
 					setTimeout(() => table.clearAlert(), 1000);
-					navigator.clipboard.writeText(data.example);
+					navigator.clipboard.writeText(data.emoji);
 				},
 				field: "",
 				formatter: () =>
@@ -411,7 +285,9 @@ async function main() {
 				title: "",
 			},
 			{
-				field: "example",
+				cssClass: "p-0 flex justify-content-center align-items-center",
+				field: "emoji",
+				formatter: fmtEmoji,
 				headerFilter: "input",
 				headerFilterFunc: (
 					headerValue,
@@ -426,12 +302,12 @@ async function main() {
 				headerSort: false,
 				hozAlign: "center",
 				responsive: 0,
-				title: "Character",
+				title: "Emoji",
 				width: 150,
 			},
 			{
-				field: "code",
-				formatter: fmtCodepoint,
+				field: "codepoints",
+				formatter: fmtCodepoints,
 				headerFilter: "input",
 				headerHozAlign: "center",
 				hozAlign: "center",
@@ -441,67 +317,23 @@ async function main() {
 					const bInt = parseInt(b, 16);
 					return aInt - bInt;
 				},
-				title: "Codepoint",
+				title: "Codepoint(s)",
 				width: 150,
 			},
 			{
-				field: "block",
-				headerFilter: "input",
-				headerHozAlign: "center",
-				hozAlign: "center",
-				responsive: 20,
-				title: "Block",
-				visible: false,
-				width: 175,
-			},
-			{
-				field: "category",
-				formatter: fmtCategory,
-				headerFilter: "input",
-				headerFilterFunc: filterCategory,
-				headerHozAlign: "center",
-				hozAlign: "center",
-				responsive: 40,
-				title: "Category",
-				visible: false,
-				width: 200,
-			},
-			{
-				field: "script",
-				headerFilter: "input",
-				headerFilterFunc: "starts",
-				headerHozAlign: "center",
-				hozAlign: "center",
-				responsive: 50,
-				title: "Script",
-				visible: false,
-				width: 100,
-			},
-			{
-				field: "age",
-				headerFilter: "input",
-				headerFilterFunc: "starts",
-				headerHozAlign: "center",
-				hozAlign: "center",
-				responsive: 30,
-				title: "Version",
-				visible: false,
-				width: 110,
-			},
-			{
-				title: "Name",
-				field: "name",
+				title: "Description",
+				field: "description",
 				formatter: "link",
 				formatterParams: {
-					labelField: "name",
+					labelField: "description",
 					url: (cell) => {
-						var codepoint = cell.getData().code;
-						return `https://www.fileformat.info/info/unicode/char/${codepoint}/index.htm`;
+						var codepoints = cell.getData().codepoints;
+						return `https://www.fileformat.info/info/emoji/${codepoints}/index.htm`;
 					},
 					target: "_blank",
 				},
 				headerFilter: "input",
-				headerFilterFunc: filterName,
+				headerFilterFunc: filterDescription,
 				headerPopup: `Use <code>^</code> to search at the beginning<br/>Use <code>/regex/</code> to search with a regular expression`,
 				headerPopupIcon:
 					'<span class="badge rounded-pill text-bg-primary">?</span>',
@@ -515,7 +347,7 @@ async function main() {
 				formatter: fmtTags,
 				headerFilter: "input",
 				headerFilterFunc: filterTags,
-				headerPopup: `Separate multiple tags with space or comma.<br/>Pr	efix a tag with <code>!</code> to exclude it.`,
+				headerPopup: `Separate multiple tags with space or comma.<br/>Prefix a tag with <code>!</code> to exclude it.`,
 				headerPopupIcon:
 					'<span class="badge rounded-pill text-bg-primary">?</span>',
 				headerSort: false,
@@ -530,10 +362,9 @@ async function main() {
 		placeholder: "No matches",
 		responsiveLayout: "hide",
 		footerElement: `<span class="w-100 mx-2 my-1">
-				<img src="/favicon.svg" class="pe-2" style="height:1.2em;" alt="UnicodeSearch logo"/>UnicodeSearch
+				<img src="/favicon.svg" class="pe-2" style="height:1.2em;" alt="EmojiSearch logo"/>EmojiSearch
 				<span id="rowcount" class="px-3">Rows: ${data.length.toLocaleString()}</span>
-				<input id="showhidecolumns" type="checkbox" class="mx-2" title="Toggle columns: Version, Block, Category, Script"/> Show/Hide Detail Columns
-				<a class="d-none d-lg-block float-end" href="https://github.com/FileFormatInfo/unicodesearch">Source</a>
+				<a class="d-none d-lg-block float-end" href="https://github.com/FileFormatInfo/emojisearch">Source</a>
 			</span>`,
 	});
 
@@ -560,11 +391,6 @@ async function main() {
 				.join("&") + "&" + qs;
 		}
 		window.history.replaceState(null, "", "?" + qs);
-	});
-
-	table.on("tableBuilt", function () {
-		document.getElementById("showhidecolumns")!.onclick = () =>
-			toggleColumns(table, ["age", "block", "category", "script"]);
 	});
 
 	document.getElementById("loading")!.style.display = "none";

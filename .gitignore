@@ -4,7 +4,7 @@ dist
 *.env
 *.log
 node_modules
-public/ucd.json
+public/emoji.json
 tmp
 *.tmp
 

@@ -1,15 +1,15 @@
-# UnicodeSearch <img alt="VectorLogoZone logo" src="public/favicon.svg" height="90" align="right" />
+# EmojiSearch <img alt="VectorLogoZone logo" src="public/favicon.svg" height="90" align="right" />
 
-[![deploy](https://github.com/FileFormatInfo/unicodesearch/actions/workflows/ghpages-deploy.yaml/badge.svg)](https://github.com/FileFormatInfo/unicodesearch/actions/workflows/ghpages-deploy.yaml)
+[![deploy](https://github.com/FileFormatInfo/emojisearch/actions/workflows/ghpages-deploy.yaml/badge.svg)](https://github.com/FileFormatInfo/emojisearch/actions/workflows/ghpages-deploy.yaml)
 
-A web app for searching and browsing the Unicode character database.
+A web app for searching and browsing the Unicode emoji database.
 
-See it in action: [unicodesearch.org](https://www.unicodesearch.org/)
+See it in action: [emojisearch.org](https://www.emojisearch.org/)
 
 ## Links
 
-- [Unicode Character Database](https://www.unicode.org/Public/17.0.0/ucd/) - XML data source for this app.
-- [Unicode Annex #42](https://www.unicode.org/reports/tr42/) - what the fields in the UCD mean.
+- [Emoji at the Unicode Character Database](https://www.unicode.org/Public/UCD/latest/ucd/emoji/) - data source for this app.
+- [Unicode Technical Standard #41: Emoji](https://unicode.org/reports/tr51/) - what the fields in the UCD mean.
 
 ## Credits
 
@@ -19,7 +19,7 @@ See it in action: [unicodesearch.org](https://www.unicodesearch.org/)
 [![Google Noto Emoji](https://www.vectorlogo.zone/logos/google/google-ar21.svg)](https://github.com/googlefonts/noto-emoji/blob/43f47be9404018cd9d8f73a227363a8f20acdab5/svg/emoji_u1f984.svg "Icon")
 [![Node.js](https://www.vectorlogo.zone/logos/nodejs/nodejs-ar21.svg)](https://nodejs.org/ "Application Server")
 [![npm](https://www.vectorlogo.zone/logos/npmjs/npmjs-ar21.svg)](https://www.npmjs.com/ "JS Package Management")
-[![Unicode](https://www.vectorlogo.zone/logos/unicode/unicode-ar21.svg)](https://www.unicode.org/Public/17.0.0/ucdxml/ "Unicode Character Database")
+[![Unicode](https://www.vectorlogo.zone/logos/unicode/unicode-ar21.svg)](https://www.unicode.org/Public/17.0.0/ "Unicode Character Database")
 [![Tabulator](https://www.vectorlogo.zone/logos/tabulatorinfo/tabulatorinfo-ar21.svg)](https://tabulator.info/ "Grid widget")
 [![TypeScript](https://www.vectorlogo.zone/logos/typescriptlang/typescriptlang-ar21.svg)](https://www.typescriptlang.org/ "Programming Language")
 [![VectorLogoZone](https://www.vectorlogo.zone/logos/vectorlogozone/vectorlogozone-ar21.svg)](https://www.vectorlogo.zone/ "Logos")
@@ -27,12 +27,6 @@ See it in action: [unicodesearch.org](https://www.unicodesearch.org/)
 
 ## To Do
 
-- [ ] handle `#` in name
-- [ ] accurate total count
-- [ ] preview column (SVGs)
 - [ ] bigger font for example column
-- [ ] status (for filter/sort) in footer
 - [ ] test dark mode
 - [ ] share links in footer
-- [ ] tags: bidi, letter, number
-- [ ] tag filters

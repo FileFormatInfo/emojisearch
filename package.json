@@ -1,6 +1,6 @@
 {
   "author": "fileformat@gmail.com",
-  "description": "UnicodeSearch",
+  "description": "EmojiSearch",
   "devDependencies": {
     "@types/node": "^24.3.1",
     "@types/tabulator-tables": "^6.2.11",

@@ -9,105 +9,83 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 type SearchEntry = {
-	code: string;
-	name: string;
-	age: string;
-	block: string;
-	category: string;
-	script: string;
-	tags?: string[];
+	codepoints: string;
+	qualification: string;
+	version: string;
+	emoji: string;
+	description: string;
+	group: string;
+	subgroup: string;
 }
 
 type SearchData = {
 	success: boolean;
+	lastmod: string;
 	data: SearchEntry[];
 }
 
 async function main() {
 	console.log(`INFO: starting at ${new Date().toISOString()}`);
 
-	const xmlPath = path.join( __dirname, '..', 'tmp', 'ucd.all.flat.xml' );
-	const jsonPath = path.join( __dirname, '..', 'public', 'ucd.json' );
+	const txtPath = path.join( __dirname, '..', 'tmp', 'emoji-test.txt' );
+	const jsonPath = path.join( __dirname, '..', 'public', 'emoji.json' );
 
 	try {
-		await fs.access(xmlPath);
+		await fs.access(txtPath);
 	} catch (err) {
-		console.log(`INFO: XML file does not exist in ${xmlPath}`);
+		console.log(`INFO: txt file does not exist in ${txtPath}`);
 		process.exit(1);
 	}
 
 	// Read and parse the XML file
-	console.log(`INFO: reading XML file from ${xmlPath}`);
-	const xmlData = await fs.readFile(xmlPath, 'utf-8');
-	console.log(`INFO: parsing XML data`);
-	const parser = new XMLParser({
-		ignoreAttributes: false,
-		attributeNamePrefix: '',
-	});
-	const jsonObj = parser.parse(xmlData);
+	console.log(`INFO: reading XML file from ${txtPath}`);
+	const txtData = await fs.readFile(txtPath, 'utf-8');
+	console.log(`INFO: parsing txt data`);
 
-	console.log(`INFO: parsed ${jsonObj.ucd.repertoire.char.length} characters`);
+	const data: SearchEntry[] = [];
+	let currentGroup = '';
+	let currentSubgroup = '';
 
-	if (true) {
-		fs.writeFile(
-			path.join(__dirname, "..", "tmp", "ucd.all.flat.json"),
-			JSON.stringify(jsonObj, null, 2),
-			"utf-8"
-		);
-	}
-
-	console.log(`INFO: generating JSON data`);
-	const entries: SearchEntry[] = [];
-
-	for (const charData of jsonObj.ucd.repertoire.char) {
-
-		if (!charData.cp || charData.cp.length === 0) {
-			if (!charData['first-cp']) {	// some private use area ranges mixed in
-				console.log(`WARN: skipping entry with no code point (${JSON.stringify(charData)})`);
+	const lines = txtData.split(/\r?\n/);
+	for (const line of lines) {
+		// console.log(`LINE: ${line}`);
+		if (line.length == 0) {
+			continue;
+		}
+		if (line.startsWith('#')) {
+			// comment line
+			if (line.startsWith('# group: ')) {
+				currentGroup = line.replace('# group: ', '').trim();
+			} else if (line.startsWith('# subgroup: ')) {
+				currentSubgroup = line.replace('# subgroup: ', '').trim();
 			}
 			continue;
 		}
 
-		const tags: string[] = [];
-		if (charData.WSpace === 'Y') {
-			tags.push('Whitespace');
+		const match = line.match(/^([0-9A-F ]+)\s*;\s*(fully-qualified|minimally-qualified|unqualified|component)\s*# (.+) E([0-9]+[.][0-9]+) (.+)$/);
+		if (match) {
+			data.push( {
+				codepoints: match[1].trim(),
+				qualification: match[2].trim(),
+				emoji: match[3].trim(),
+				description: match[5].trim(),
+				version: match[4].trim(),
+				group: currentGroup,
+				subgroup: currentSubgroup,
+				});
+		} else {
+			console.log(`DEBUG: no match for line: ${line}`);
 		}
-		if (charData.Emoji === 'Y') {
-			tags.push('Emoji');
-		}
-		if (charData.Dep === 'Y') {
-			tags.push('Deprecated');
-		}
-		if (charData.QMark === 'Y') {
-			tags.push('Quote');
-		}
-		if (charData.Dash === 'Y') {
-			tags.push('Dash');
-		}
-
-		var name = charData.na || charData.na1;
-		if (!name && charData['name-alias']) {
-			name = charData['name-alias'][0].alias;
-		}
-
-		entries.push({
-			code: charData.cp,
-			name: name || "(no name)",
-			age: charData.age,
-			block: charData.blk.replaceAll('_', ' '),
-			category: charData.gc,
-			script: charData.sc,
-			tags: tags.length ? tags : undefined,
-		});
 	}
 
 	const output: SearchData = {
 		success: true,
-		data: entries,
+		lastmod: new Date().toISOString(),
+		data,
 	};
 
 	// Write the JSON data to a file
-	console.log(`INFO: writing JSON data to ${jsonPath}`);
+	console.log(`INFO: writing ${data.length} emoji data to ${jsonPath}`);
 	await fs.writeFile(jsonPath, JSON.stringify(output, null, 2), 'utf-8');
 	console.log(`INFO: wrote JSON data to ${jsonPath}`);
 }

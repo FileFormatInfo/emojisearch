@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Download and unzip the Unicode Character Database XML file
+# Download and unzip the emoji test file
 # from Unicode.org.
 #
 
@@ -23,12 +23,9 @@ fi
 
 curl \
 	--location \
-	--output "${TMP_DIR}/ucd.all.flat.zip" \
+	--output "${TMP_DIR}/emoji-test.txt" \
 	--show-error \
 	--silent \
-	https://www.unicode.org/Public/latest/ucdxml/ucd.all.flat.zip
-
-cd "${TMP_DIR}"
-unzip ucd.all.flat.zip
+	https://www.unicode.org/Public/17.0.0/emoji/emoji-test.txt
 
 echo "INFO: completed download at $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
