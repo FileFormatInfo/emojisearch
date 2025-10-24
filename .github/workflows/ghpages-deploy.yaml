@@ -28,12 +28,17 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt-get install -y jq moreutils
           npm install
 
       - name: Process UCD XML to JSON
         run: |
           ./bin/ucd_download.sh
           ./bin/ucd_to_json.ts
+
+      - name: Set Status Info
+        run: |
+          ./bin/set_status.sh
 
       - name: Build
         run: |
