@@ -36,6 +36,7 @@ type SearchData = {
 
 type EmojiData = {
 	codepoints: string;
+	order: number;
 	emoji: string;
 	description: string;
 	tags: string[];
@@ -242,6 +243,7 @@ async function main() {
 		return;
 	}
 
+	var order = 0;
 	for (const row of rawData.data) {
 		const tags = [row.group.replaceAll(' ', '-'), row.subgroup, row.qualification, row.version];
 		if (row.description.endsWith("skin tone")) {
@@ -254,6 +256,7 @@ async function main() {
 		}
 		data.push( {
 			codepoints: row.codepoints,
+			order: order++,
 			emoji: row.emoji,
 			description: row.description,
 			tags,
@@ -264,17 +267,17 @@ async function main() {
 	console.log(data[0]);
 
 	const qs = new URLSearchParams(window.location.search);
-	const sort: Sorter[] = [ { column: "codepoints", dir: "asc" } ];
+	const initialSort: Sorter[] = [ { column: "emoji", dir: "asc" } ];
 	const filters: Filter[] = [];
 	if (qs) {
 		;
 		for (const [key, value] of qs.entries()) {
 			if (key == "sort") {
-				sort[0].column = value;
+				initialSort[0].column = value;
 				continue;
 			}
 			if (key == "dir") {
-				sort[0].dir = (value == "desc") ? "desc" : "asc";
+				initialSort[0].dir = value == "desc" ? "desc" : "asc";
 			}
 			if (key && value) {
 				filters.push({ field: key, type: "=", value: value });
@@ -295,7 +298,7 @@ async function main() {
 		TooltipModule,
 	]);
 
-	const table = new Tabulator("#achtable", {
+	const table = new Tabulator("#emojitable", {
 		autoResize: true,
 		data,
 		columns: [
@@ -331,9 +334,13 @@ async function main() {
 					return headerValue == rowValue;
 				},
 				headerHozAlign: "center",
-				headerSort: false,
 				hozAlign: "center",
 				responsive: 0,
+				sorter: (a, b, aRow, bRow, column, dir, sorterParams) => {
+					var aOrder = aRow.getData().order;
+					var bOrder = bRow.getData().order;
+					return aOrder - bOrder;
+				},
 				title: "Emoji",
 				width: 150,
 			},
@@ -389,7 +396,7 @@ async function main() {
 		],
 		height: "100%",
 		initialHeaderFilter: filters,
-		initialSort: [{ column: "code", dir: "asc" }],
+		initialSort,
 		layout: "fitDataStretch",
 		placeholder: "No matches",
 		responsiveLayout: "hide",
@@ -402,31 +409,30 @@ async function main() {
 
 	table.on("dataFiltered", function (filters, rows) {
 		var el = document.getElementById("rowcount");
+		var qs = new URLSearchParams(window.location.search);
+		for (const col of table.getColumns()) {
+			qs.delete(col.getField());
+		}
 		if (filters && filters.length > 0) {
 			el!.innerHTML = `Rows: ${rows.length.toLocaleString()} of ${data.length.toLocaleString()}`;
-			var qs = filters
-				.map(f => `${encodeURIComponent(f.field)}=${encodeURIComponent(f.value)}`)
-				.join("&");
-			qs += `&sort=${table.getSorters()[0]?.column.getField()}&dir=${table.getSorters()[0]?.dir}`;
-			window.history.replaceState(null, "", "?" + qs);
+			for (const f of filters) {
+				qs.set(f.field, f.value as string);
+			}
 		} else {
 			el!.innerHTML = `Rows: ${data.length.toLocaleString()}`;
-		}
-	});
-
-	table.on("dataSorted", function (sorters, rows) {
-		var qs = `sort=${sorters[0]?.column.getField()}&dir=${sorters[0]?.dir}`;
-		const filters = table.getFilters(true);
-		if (filters && filters.length > 0) {
-			qs = filters
-				.map(f => `${encodeURIComponent(f.field)}=${encodeURIComponent(f.value)}`)
-				.join("&") + "&" + qs;
 		}
 		window.history.replaceState(null, "", "?" + qs);
 	});
 
+	table.on("dataSorted", function (sorters, rows) {
+		var qs = new URLSearchParams(window.location.search);
+		qs.set("sort", sorters[0]?.column.getField());
+		qs.set("dir", sorters[0]?.dir);
+		window.history.replaceState(null, "", "?" + qs);
+	});
+
 	document.getElementById("loading")!.style.display = "none";
-	document.getElementById("achtable")!.style.display = "block";
+	document.getElementById("emojitable")!.style.display = "block";
 }
 
 main();
