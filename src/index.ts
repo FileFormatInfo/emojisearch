@@ -374,7 +374,7 @@ async function main() {
 					labelField: "description",
 					url: (cell) => {
 						var codepoints = cell.getData().codepoints;
-						return `https://www.fileformat.info/info/emoji/${codepoints}/index.htm`;
+						return `https://www.fileformat.info/info/emoji/${codepoints.toLowerCase().replaceAll(' ', '_')}/index.htm`;
 					},
 					target: "_blank",
 				},
