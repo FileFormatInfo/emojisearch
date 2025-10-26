@@ -36,6 +36,11 @@ jobs:
           ./bin/ucd_download.sh
           ./bin/ucd_to_json.mts
 
+      - name: Add gemoji data to JSON
+        run: |
+          ./bin/gemoji_download.sh
+          ./bin/gemoji_add.mts
+
       - name: Set Status Info
         run: |
           ./bin/set_status.sh

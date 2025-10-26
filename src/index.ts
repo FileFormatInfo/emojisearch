@@ -26,6 +26,7 @@ type SearchEntry = {
 	version: string;
 	group: string;
 	subgroup: string;
+	keywords?: string[];
 };
 
 type SearchData = {
@@ -38,6 +39,7 @@ type EmojiData = {
 	emoji: string;
 	description: string;
 	tags: string[];
+	keywords?: string[];
 }
 
 const dataUrl = "/emoji.json";
@@ -50,12 +52,17 @@ function filterDescription(
 ) {
 	if (!headerValue) return true;
 
-	const rowValue = rowData.description as string;
+	const rowValues = [rowData.description, ...(rowData.keywords || [])];
 
 	if (headerValue.length == 1 && headerValue != "^" && headerValue != "/") {
 		// single character, do starts with
 		const search = headerValue.toLowerCase();
-		return rowValue.toLowerCase().startsWith(search);
+		for (const rowValue of rowValues) {
+			if (rowValue.toLowerCase().startsWith(search)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	if (headerValue.startsWith("^")) {
@@ -64,7 +71,12 @@ function filterDescription(
 			return true;
 		}
 		const search = headerValue.substring(1).toLowerCase();
-		return rowValue.toLowerCase().startsWith(search);
+		for (const rowValue of rowValues) {
+			if (rowValue.toLowerCase().startsWith(search)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	if (headerValue.startsWith("/") && headerValue.endsWith("/")) {
@@ -72,7 +84,12 @@ function filterDescription(
 		const pattern = headerValue.substring(1, headerValue.length - 1);
 		try {
 			const re = new RegExp(pattern, "i");
-			return re.test(rowValue);
+			for (const rowValue of rowValues) {
+				if (re.test(rowValue)) {
+					return true;
+				}
+			}
+			return false;
 		} catch (e) {
 			// bad regex
 			return false;
@@ -81,7 +98,12 @@ function filterDescription(
 
 	// contains
 	const search = headerValue.toLowerCase();
-	return rowValue.toLowerCase().includes(search);
+	for (const rowValue of rowValues) {
+		if (rowValue.toLowerCase().includes(search)) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function filterTags(
@@ -235,6 +257,7 @@ async function main() {
 			emoji: row.emoji,
 			description: row.description,
 			tags,
+			keywords: row.keywords,
 		} );
 	}
 
