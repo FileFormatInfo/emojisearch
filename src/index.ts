@@ -314,9 +314,7 @@ async function main() {
 					const data = cell.getRow().getData();
 					e.preventDefault();
 					e.stopPropagation();
-					table.alert(
-						`${data.description} copied to clipboard`
-					);
+					table.alert(`${data.description} copied to clipboard`);
 					setTimeout(() => table.clearAlert(), 1000);
 					navigator.clipboard.writeText(data.emoji);
 				},
@@ -374,7 +372,9 @@ async function main() {
 					labelField: "description",
 					url: (cell) => {
 						var codepoints = cell.getData().codepoints;
-						return `https://www.fileformat.info/info/emoji/${codepoints.toLowerCase().replaceAll(' ', '_')}/index.htm`;
+						return `https://www.fileformat.info/info/emoji/${codepoints
+							.toLowerCase()
+							.replaceAll(" ", "_")}/index.htm`;
 					},
 					target: "_blank",
 				},
@@ -408,7 +408,7 @@ async function main() {
 		placeholder: "No matches",
 		responsiveLayout: "hide",
 		footerElement: `<span class="w-100 mx-2 my-1">
-				<img src="/favicon.svg" class="pe-2" style="height:1.2em;" alt="EmojiSearch logo"/>EmojiSearch
+				<img src="/favicon.svg" class="pe-2 mb-1" style="height:1.5em;" alt="EmojiSearch logo"/><span style="font-size: 1.2em;font-family: 'Emilys Candy'">EmojiSearch</span>
 				<span id="rowcount" class="px-3">Rows: ${data.length.toLocaleString()}</span>
 				<a class="d-none d-lg-block float-end" href="https://github.com/FileFormatInfo/emojisearch">Source</a>
 			</span>`,
