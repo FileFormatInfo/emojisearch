@@ -36,6 +36,7 @@ async function main() {
 	console.log(`INFO: starting at ${new Date().toISOString()}`);
 
 	const gemojiPath = path.join( __dirname, '..', 'tmp', 'gemoji.json' );
+	const emojilibPath = path.join( __dirname, '..', 'tmp', 'emojilib.json' );
 	const jsonPath = path.join( __dirname, '..', 'public', 'emoji.json' );
 
 	try {
@@ -57,6 +58,19 @@ async function main() {
 	}
 
 	try {
+		await fs.access(emojilibPath);
+	} catch (err) {
+		console.log(`INFO: emojilib file does not exist in ${emojilibPath}`);
+		process.exit(1);
+	}
+
+	// Read and parse the emojilib file
+	console.log(`INFO: reading file from ${emojilibPath}`);
+	const emojilibData = await fs.readFile(emojilibPath, "utf-8");
+	console.log(`INFO: parsing emojilib data`);
+	const emojilibMap = JSON.parse(emojilibData) as { [key: string]: string[] };
+
+	try {
 		await fs.access(jsonPath);
 	} catch (err) {
 		console.log(`INFO: data file does not exist in ${jsonPath}`);
@@ -70,14 +84,21 @@ async function main() {
 	const data = JSON.parse(rawData) as SearchData;
 
 	for (const row of data.data) {
+		const newTags = new Set<string>();
 		const gemojiEntry = gemojiMap.get(row.emoji);
 		if (!gemojiEntry) {
 			console.log(`WARN: no gemoji entry found for emoji ${row.emoji} (${row.description})`);
-			continue;
+		}
+		else {
+			gemojiEntry.tags.forEach(newTags.add, newTags);
+			gemojiEntry.aliases.forEach(newTags.add, newTags);
 		}
 
-		// merge tags and aliases
-		const newTags = new Set<string>([...gemojiEntry.tags, ...gemojiEntry.aliases]);
+		const emojilibKeywords = emojilibMap[row.emoji];
+		if (emojilibKeywords) {
+			emojilibKeywords.forEach(newTags.add, newTags);
+		}
+
 		if (newTags.size === 0) {
 			continue;
 		}
