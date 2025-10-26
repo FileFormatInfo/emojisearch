@@ -221,11 +221,20 @@ async function main() {
 	}
 
 	for (const row of rawData.data) {
+		const tags = [row.group.replaceAll(' ', '-'), row.subgroup, row.qualification, row.version];
+		if (row.description.endsWith("skin tone")) {
+			tags.push("skin-tone");
+			var colon = row.description.lastIndexOf(":");
+			if (colon != -1) {
+				const tone = row.description.slice(colon + 2, -10);
+				tags.push(tone.replaceAll(' ', '-').toLowerCase());
+			}
+		}
 		data.push( {
 			codepoints: row.codepoints,
 			emoji: row.emoji,
 			description: row.description,
-			tags: [row.group.replaceAll(' ', '-'), row.subgroup, row.qualification, row.version],
+			tags,
 		} );
 	}
 
