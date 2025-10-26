@@ -137,7 +137,14 @@ function fmtCodepoints(cell: CellComponent) {
 	if (!val) {
 		return "";
 	}
-	return `U+${val.toUpperCase()}`;
+	if (val.indexOf(" ") == -1) {
+		return `U+${val.toUpperCase()}`;
+	}
+
+	const parts = val.split(" ");
+
+	return `<abbr title="U+${parts.join(" U+").toUpperCase()}">${parts.length}</abbr>`
+
 }
 
 function fmtEmoji(cell: CellComponent) {
