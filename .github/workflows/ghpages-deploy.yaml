@@ -34,7 +34,7 @@ jobs:
       - name: Process UCD XML to JSON
         run: |
           ./bin/ucd_download.sh
-          ./bin/ucd_to_json.ts
+          ./bin/ucd_to_json.mts
 
       - name: Set Status Info
         run: |

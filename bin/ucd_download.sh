@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #
-# Download and unzip the emoji test file
-# from Unicode.org.
+# Download and unzip the emoji test file from Unicode.org.
 #
 
 set -o nounset
@@ -11,7 +10,7 @@ set -o pipefail
 SCRIPT_HOME="$( cd "$( dirname "$0" )" && pwd )"
 BASE_DIR=$(realpath "${SCRIPT_HOME}/..")
 
-echo "INFO: starting download at $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+echo "INFO: starting ucd download at $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
 TMP_DIR="${BASE_DIR}/tmp"
 if [ ! -d "${TMP_DIR}" ]; then
@@ -28,4 +27,4 @@ curl \
 	--silent \
 	https://www.unicode.org/Public/17.0.0/emoji/emoji-test.txt
 
-echo "INFO: completed download at $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+echo "INFO: completed ucd download at $(date -u +"%Y-%m-%dT%H:%M:%SZ")"

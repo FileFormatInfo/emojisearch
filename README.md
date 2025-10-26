@@ -27,6 +27,8 @@ See it in action: [emojisearch.org](https://www.emojisearch.org/)
 
 ## To Do
 
-- [ ] bigger font for example column
+- [ ] images
+- [ ] detail columns
+- [ ] better formatting of codepoint(s) column w/multiple
 - [ ] test dark mode
 - [ ] share links in footer
