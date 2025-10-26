@@ -1,5 +1,6 @@
 import "./styles.css";
 import "../node_modules/tabulator-tables/dist/css/tabulator_bootstrap5.min.css";
+import statusData from "../public/status.json"
 
 import {
 	CellComponent,
@@ -408,7 +409,7 @@ async function main() {
 		placeholder: "No matches",
 		responsiveLayout: "hide",
 		footerElement: `<span class="w-100 mx-2 my-1">
-				<img src="/favicon.svg" class="pe-2 mb-1" style="height:1.5em;" alt="EmojiSearch logo"/><span style="font-size: 1.2em;font-family: 'Emilys Candy'">EmojiSearch</span>
+				<img id="favicon" src="/favicon.svg" class="pe-2 mb-1" style="height:1.5em;" alt="EmojiSearch logo"/><span style="font-size: 1.2em;font-family: 'Emilys Candy'">EmojiSearch</span>
 				<span id="rowcount" class="px-3">Rows: ${data.length.toLocaleString()}</span>
 				<a class="d-none d-lg-block float-end" href="https://github.com/FileFormatInfo/emojisearch">Source</a>
 			</span>`,
@@ -436,6 +437,13 @@ async function main() {
 		qs.set("sort", sorters[0]?.column.getField());
 		qs.set("dir", sorters[0]?.dir);
 		window.history.replaceState(null, "", "?" + qs);
+	});
+
+	table.on("tableBuilt", function () {
+		document.getElementById("favicon")!.onclick = () => {
+			table.alert(`Last modified ${statusData.lastmod} (${statusData.commit})`);
+			setTimeout(() => table.clearAlert(), 2500);
+		}
 	});
 
 	document.getElementById("loading")!.style.display = "none";
