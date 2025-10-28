@@ -232,6 +232,8 @@ function toggleTagArray(tags: string[], tag: string): string[] {
 
 async function main() {
 	let data: EmojiData[] = [];
+	let emojiVersion = 0.0;
+	let emojiVersionStr = "";
 
 	var rawData:any;
 	try {
@@ -261,6 +263,10 @@ async function main() {
 				const tone = row.description.slice(colon + 2, -10);
 				tags.push(tone.replaceAll(' ', '-').toLowerCase());
 			}
+		}
+		if (parseFloat(row.version) > emojiVersion) {
+			emojiVersion = parseFloat(row.version);
+			emojiVersionStr = row.version;
 		}
 		data.push( {
 			codepoints: row.codepoints,
@@ -441,7 +447,7 @@ async function main() {
 
 	table.on("tableBuilt", function () {
 		document.getElementById("favicon")!.onclick = () => {
-			table.alert(`Last modified ${statusData.lastmod} (${statusData.commit})`);
+			table.alert(`Emoji v${emojiVersionStr} (built on ${statusData.lastmod} - ${statusData.commit})`);
 			setTimeout(() => table.clearAlert(), 2500);
 		}
 	});
