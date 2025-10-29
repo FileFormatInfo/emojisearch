@@ -1,6 +1,8 @@
 # EmojiSearch <img alt="VectorLogoZone logo" src="public/favicon.svg" height="90" align="right" />
 
 [![deploy](https://github.com/FileFormatInfo/emojisearch/actions/workflows/ghpages-deploy.yaml/badge.svg)](https://github.com/FileFormatInfo/emojisearch/actions/workflows/ghpages-deploy.yaml)
+[![emoji](https://img.shields.io/badge/dynamic/json.svg?label=emoji&url=https%3A%2F%2Fwww.emojisearch.org%2Fstatus.json&query=%24.emojicount)](https://www.emojisearch.org/)
+[![Status](https://img.shields.io/nodeping/status/B6RTMJ8A-A6ES-4AVT-8XQK-6LMQJ5DYK7A1.svg?style=flat)](https://nodeping.com/reports/checks/B6RTMJ8A-A6ES-4AVT-8XQK-6LMQJ5DYK7A1)
 
 A web app for searching and browsing the Unicode emoji database.
 
