@@ -20,13 +20,12 @@
 	<link href="/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body class="h-100">
+<body class="h-100 w-100 d-flex">
 	<script type="module" src="./index.ts"></script>
-	<div class="scriptonly" id="loading">
+	<div class="h-100 w-100 align-items-center justify-content-center scriptonly" id="loading">
 		<img src="/images/spinner.gif" alt="Loading..." />
 	</div>
-	<div id="emojitable" style="display:none">
-	</div>
+	<div id="emojitable" class="d-none w-100 h-100"></div>
 	<div id="errdiv" class="d-none d-flex flex-column justify-content-center align-items-center w-100 h-100">
 		<div class="alert alert-danger m-3" role="alert">
 			<img class="pe-2" src="/images/stop.svg" alt="Error" width="100" height="100" />
@@ -37,7 +36,7 @@
 		<div class="d-flex flex-column justify-content-center align-items-center w-100 h-100">
 			<div class="d-flex flex-row align-items-center alert alert-danger m-3" role="alert">
 				<img class="pe-2" src="/images/stop.svg" alt="Error" width="100" height="100" />
-				<span class="fs-4">EmojiSearch requires JavaScript. Try <a href="https://www.fileformat.info/info/emoji/">FileFormat.Info</a> to search without Javascript.</span>
+				<span class="fs-4">EmojiSearch requires JavaScript. Try <a href="https://www.fileformat.info/info/emoji/list.htm">FileFormat.Info</a> to search without Javascript.</span>
 			</div>
 		</div>
 	</noscript>

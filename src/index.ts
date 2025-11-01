@@ -452,8 +452,8 @@ async function main() {
 		}
 	});
 
-	document.getElementById("loading")!.style.display = "none";
-	document.getElementById("emojitable")!.style.display = "block";
+	document.getElementById("loading")!.classList.add("d-none");
+	document.getElementById("emojitable")!.classList.remove("d-none");
 }
 
 main();
