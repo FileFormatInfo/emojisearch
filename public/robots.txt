@@ -1,0 +1,9 @@
+#
+# robots.txt for EmojiSearch.org
+#
+
+Sitemap: https://www.emojisearch.org/sitemap.xml
+
+User-agent: *
+Disallow: /honeypot.txt
+Allow: /

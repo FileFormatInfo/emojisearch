@@ -28,6 +28,7 @@ See it in action: [emojisearch.org](https://www.emojisearch.org/)
 [![Vite](https://www.vectorlogo.zone/logos/vitejsdev/vitejsdev-ar21.svg)](https://vitejs.dev/ "Bundler")
 
 * [Gemoji](https://github.com/github/gemoji)
+* [emojilib](https://github.com/muan/emojilib)
 * [Font Diner](https://fontdiner.com/) - Emilys Candy font
 
 ## To Do
