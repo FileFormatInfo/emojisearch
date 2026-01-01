@@ -183,6 +183,21 @@ function fmtTags(cell: CellComponent) {
 	return container;
 }
 
+function makePreviewImage(brand: string) {
+	return function fmtPreviewImage(cell: CellComponent) {
+		const val = cell.getValue() as string;
+		if (!val) {
+			return "";
+		}
+		const codepoints = val
+			.split(" ")
+			.map((cp) => cp.toLowerCase())
+			.join("-");
+		const url = `https://images.emojisearch.org/${brand}/${codepoints}.png`;
+
+		return `<img src="${url}" alt="${brand} version" title="${brand} version" onerror="this.src='/images/broken.svg';this.alt=this.title='not supported by ${brand} yet';" style="height:2rem;">`;
+	}
+}
 
 function showError(msg: string) {
 	console.log(`ERROR: ${msg}`);
@@ -357,6 +372,39 @@ async function main() {
 				width: 150,
 			},
 			{
+				cssClass: "pt-2 flex justify-content-center align-items-center",
+				field: "codepoints",
+				formatter: makePreviewImage("apple"),
+				headerHozAlign: "center",
+				headerSort: false,
+				hozAlign: "center",
+				responsive: 100,
+				title: `<img src="https://www.vectorlogo.zone/logos/apple/apple-icon.svg" style="height:2rem;" />`,
+				width: 75,
+			},
+			{
+				cssClass: "pt-2 flex justify-content-center align-items-center",
+				field: "codepoints",
+				formatter: makePreviewImage("google"),
+				headerHozAlign: "center",
+				headerSort: false,
+				hozAlign: "center",
+				responsive: 100,
+				title: `<img src="https://www.vectorlogo.zone/logos/android/android-icon.svg" style="height:2rem;" />`,
+				width: 75,
+			},
+			{
+				cssClass: "pt-2 flex justify-content-center align-items-center",
+				field: "codepoints",
+				formatter: makePreviewImage("microsoft"),
+				headerHozAlign: "center",
+				headerSort: false,
+				hozAlign: "center",
+				responsive: 100,
+				title: `<img src="https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg" style="height:2rem;" />`,
+				width: 75,
+			},
+			{
 				field: "codepoints",
 				formatter: fmtCodepoints,
 				headerFilter: "input",
@@ -416,7 +464,7 @@ async function main() {
 		responsiveLayout: "hide",
 		footerElement: `<span class="w-100 mx-2 my-1">
 				<img id="favicon" src="/favicon.svg" class="pe-2 mb-1" style="height:1.5em;" alt="EmojiSearch logo"/><span style="font-size: 1.2em;font-family: 'Emilys Candy'">EmojiSearch</span>
-				<span id="rowcount" class="px-3">Rows: ${data.length.toLocaleString()}</span>
+				<span id="rowcount" class="px-3">Emoji: ${data.length.toLocaleString()}</span>
 				<a class="d-none d-lg-block float-end" href="https://github.com/FileFormatInfo/emojisearch">Source</a>
 			</span>`,
 	});
@@ -428,12 +476,12 @@ async function main() {
 			qs.delete(col.getField());
 		}
 		if (filters && filters.length > 0) {
-			el!.innerHTML = `Rows: ${rows.length.toLocaleString()} of ${data.length.toLocaleString()}`;
+			el!.innerHTML = `Emoji: ${rows.length.toLocaleString()} of ${data.length.toLocaleString()}`;
 			for (const f of filters) {
 				qs.set(f.field, f.value as string);
 			}
 		} else {
-			el!.innerHTML = `Rows: ${data.length.toLocaleString()}`;
+			el!.innerHTML = `Emoji: ${data.length.toLocaleString()}`;
 		}
 		window.history.replaceState(null, "", "?" + qs);
 	});
