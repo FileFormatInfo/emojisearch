@@ -185,7 +185,7 @@ function fmtTags(cell: CellComponent) {
 
 function makePreviewImage(brand: string) {
 	return function fmtPreviewImage(cell: CellComponent) {
-		const val = cell.getValue() as string;
+		const val = cell.getRow().getData().codepoints as string;
 		if (!val) {
 			return "";
 		}
@@ -204,6 +204,19 @@ function showError(msg: string) {
 	document.getElementById("loading")!.classList.add("d-none");
 	document.getElementById("errdiv")!.classList.remove("d-none");
 	document.getElementById("errmsg")!.innerHTML = msg;
+}
+
+function toggleColumns(tbl: Tabulator, columns: string[], visible: boolean): void {
+	for (const col of columns) {
+		const column = tbl.getColumn(col);
+		if (column) {
+			if (visible) {
+				column.show();
+			} else {
+				column.hide();
+			}
+		}
+	}
 }
 
 function toggleTagFilter(cell: CellComponent, tag: string): void {
@@ -249,6 +262,7 @@ async function main() {
 	let data: EmojiData[] = [];
 	let emojiVersion = 0.0;
 	let emojiVersionStr = "";
+	var detail = false;
 
 	var rawData:any;
 	try {
@@ -307,6 +321,11 @@ async function main() {
 			}
 			if (key == "dir") {
 				initialSort[0].dir = value == "desc" ? "desc" : "asc";
+				continue;
+			}
+			if (key == "detail") {
+				detail = value == "1" || value.toLowerCase() == "true";
+				continue;
 			}
 			if (key && value) {
 				filters.push({ field: key, type: "=", value: value });
@@ -372,36 +391,42 @@ async function main() {
 				width: 150,
 			},
 			{
-				cssClass: "pt-2 flex justify-content-center align-items-center",
-				field: "codepoints",
+				cssClass:
+					"pt-2 pb-0 flex justify-content-center align-items-center",
+				field: "apple",
 				formatter: makePreviewImage("apple"),
 				headerHozAlign: "center",
 				headerSort: false,
 				hozAlign: "center",
 				responsive: 100,
 				title: `<img src="https://www.vectorlogo.zone/logos/apple/apple-icon.svg" style="height:2rem;" />`,
+				visible: detail,
 				width: 75,
 			},
 			{
-				cssClass: "pt-2 flex justify-content-center align-items-center",
-				field: "codepoints",
+				cssClass:
+					"pt-2 pb-0 flex justify-content-center align-items-center",
+				field: "google",
 				formatter: makePreviewImage("google"),
 				headerHozAlign: "center",
 				headerSort: false,
 				hozAlign: "center",
 				responsive: 100,
 				title: `<img src="https://www.vectorlogo.zone/logos/android/android-icon.svg" style="height:2rem;" />`,
+				visible: detail,
 				width: 75,
 			},
 			{
-				cssClass: "pt-2 flex justify-content-center align-items-center",
-				field: "codepoints",
+				cssClass:
+					"pt-2 pb-0 flex justify-content-center align-items-center",
+				field: "microsoft",
 				formatter: makePreviewImage("microsoft"),
 				headerHozAlign: "center",
 				headerSort: false,
 				hozAlign: "center",
 				responsive: 100,
 				title: `<img src="https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg" style="height:2rem;" />`,
+				visible: detail,
 				width: 75,
 			},
 			{
@@ -465,6 +490,9 @@ async function main() {
 		footerElement: `<span class="w-100 mx-2 my-1">
 				<img id="favicon" src="/favicon.svg" class="pe-2 mb-1" style="height:1.5em;" alt="EmojiSearch logo"/><span style="font-size: 1.2em;font-family: 'Emilys Candy'">EmojiSearch</span>
 				<span id="rowcount" class="px-3">Emoji: ${data.length.toLocaleString()}</span>
+				<input id="showhidecolumns" type="checkbox" class="mx-2" title="Toggle image columns" ${
+					detail ? "checked" : ""
+				}/> Images
 				<a class="d-none d-lg-block float-end" href="https://github.com/FileFormatInfo/emojisearch">Source</a>
 			</span>`,
 	});
@@ -497,6 +525,21 @@ async function main() {
 		document.getElementById("favicon")!.onclick = () => {
 			table.alert(`Emoji v${emojiVersionStr} (built on ${statusData.lastmod} - ${statusData.commit})`);
 			setTimeout(() => table.clearAlert(), 2500);
+		}
+		document.getElementById("showhidecolumns")!.onclick = () => {
+			detail = !detail;
+			toggleColumns(table, [
+				"apple",
+				"google",
+				"microsoft",
+			], detail);
+			const qs = new URLSearchParams(window.location.search);
+			if (detail) {
+				qs.set("detail", "1");
+			} else {
+				qs.delete("detail");
+			}
+			window.history.replaceState(null, "", "?" + qs.toString());
 		}
 	});
 
