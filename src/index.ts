@@ -374,7 +374,7 @@ async function main() {
 					headerValue,
 					rowValue,
 					rowData,
-					filterParams
+					filterParams,
 				) => {
 					if (!headerValue) return true;
 					return headerValue == rowValue;
@@ -426,6 +426,19 @@ async function main() {
 				hozAlign: "center",
 				responsive: 100,
 				title: `<img src="https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg" style="height:2rem;" />`,
+				visible: detail,
+				width: 75,
+			},
+			{
+				cssClass:
+					"pt-2 pb-0 flex justify-content-center align-items-center",
+				field: "twemoji",
+				formatter: makePreviewImage("twemoji"),
+				headerHozAlign: "center",
+				headerSort: false,
+				hozAlign: "center",
+				responsive: 100,
+				title: `<img src="https://www.vectorlogo.zone/logos/twitter/twitter-icon.svg" style="height:2rem;" />`,
 				visible: detail,
 				width: 75,
 			},
@@ -532,6 +545,7 @@ async function main() {
 				"apple",
 				"google",
 				"microsoft",
+				"twemoji",
 			], detail);
 			const qs = new URLSearchParams(window.location.search);
 			if (detail) {
